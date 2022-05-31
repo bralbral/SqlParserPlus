@@ -4,7 +4,6 @@
 [![Docker Image Size](https://badgen.net/docker/size/bral1488/sql_parser_plus?icon=docker&label=image%20size)](https://hub.docker.com/repository/docker/bral1488/sql_parser_plus/)
 
 
-
 Inspired by: https://github.com/citcheese/SqlParserPlus
 
 What is it?
@@ -26,13 +25,11 @@ Show commands:
 
 Run:
 -------------
+
 ```
-    docker run --rm bral1488/sql_parser_plus:latest
+   docker run --rm -v /abs_path_to_dir_at_your_host:/sqlfolder  test  python3 ./SqlParserPlus.py --sqlextract /sqlfolder --dumpall
 ```
 
-Using docker-compose:
---------------------
-```
-    docker run --rm bral1488/sql_parser_plus:latest
- ```
+*WARNING:* the --dumpall key must be set, otherwise a [gui](window.JPG) that is not available in the container will be called.
+
 
