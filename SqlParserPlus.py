@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-import re
 import csv
-from easygui import *
-import sys
-from tqdm import tqdm
 import os
-from colorama import Fore
+import re
+import sys
 from pathlib import Path
+
 import pandas as pd
+from colorama import Fore
+from easygui import *
+from tqdm import tqdm
 
 pd.set_option("display.max_columns", None)
 
@@ -126,7 +127,7 @@ def SQLtoJson(filename, ENCODING, FORMAT="json", dumpall=False):
                             .strip('"')
                         )
                         noncreatetableTables.append(tablename)
-                except:
+                except (Exception,):
                     pass
                 if line.lower().startswith("create table"):
                     line = line.replace("IF NOT EXISTS ", "").replace(
@@ -155,12 +156,12 @@ def SQLtoJson(filename, ENCODING, FORMAT="json", dumpall=False):
             )
         table_list.sort()
 
-        return (table_list, othertables, noncreatetableTables)
+        return table_list, othertables, noncreatetableTables
 
     tables, othertables, noncreatetableTables = find_tables(filename)
 
     def read_dump(dump_filename, target_table, dumbdump=False):
-        tableregexp = re.compile(f"[`'\s]({target_table})[`'\s(]")
+        tableregexp = re.compile(f"[`'\s\.]({target_table})[`'\s(]")
         errors = []
         # print (F"Grabbing values for table: {target_table}")
         with open(
@@ -172,6 +173,10 @@ def SQLtoJson(filename, ENCODING, FORMAT="json", dumpall=False):
             items = []
             values = []
             wronglength = []
+
+            # TODO added 01.06.2022 Can change work logic
+            if not headers and read_mode == 3:
+                headers = backupheaders(dump_filename, ENCODING)
 
             for line in tqdm(
                 f, desc=f"Parsing {Fore.LIGHTBLUE_EX}{target_table}{Fore.RESET} table"
@@ -327,6 +332,7 @@ def SQLtoJson(filename, ENCODING, FORMAT="json", dumpall=False):
 
             if not headers:
                 headers = backupheaders(dump_filename, ENCODING)
+
             values = [
                 list(item) for item in set(tuple(row) for row in values)
             ]  # filter out exact duplicate entries, convert to tuple first as lists cant be hashed
@@ -469,7 +475,7 @@ def backupheaders(dump_filename, ENCODING):
     headers = next(
         x for x in content if x.startswith("INSERT INTO")
     )  # find item with headers
-    headers = re.findall("\((.*\))", headers)[0]
+    headers = re.findall("\(([^);]+\))", headers)[0]
     headers = headers.strip(" ()")
     headers = headers.split(",")
     headers = [x.strip(" `") for x in headers]
@@ -924,8 +930,6 @@ def convertXL2csv(
 
 
 def sqlconverter(filepath, format, get_encoding=False, dumpall=False):
-    from pathlib import Path
-
     if get_encoding:
         ENCODING = predict_encoding(filepath)
         print(f"Identified encoding of file as {ENCODING}")
