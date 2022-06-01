@@ -174,9 +174,6 @@ def SQLtoJson(filename, ENCODING, FORMAT="json", dumpall=False):
             values = []
             wronglength = []
 
-            # TODO added 01.06.2022 Can change work logic
-            if not headers and read_mode == 3:
-                headers = backupheaders(dump_filename, ENCODING)
 
             for line in tqdm(
                 f, desc=f"Parsing {Fore.LIGHTBLUE_EX}{target_table}{Fore.RESET} table"
@@ -307,6 +304,11 @@ def SQLtoJson(filename, ENCODING, FORMAT="json", dumpall=False):
                                 thing1 = cleanline(
                                     newline, readmode=3, overridequotechar="'"
                                 )
+
+                                # TODO added 01.06.2022 Can change work logic
+                                if not headers:
+                                    headers = backupheaders(dump_filename, ENCODING)
+
                                 for x in thing1:
                                     if len(x) == len(headers):
 
