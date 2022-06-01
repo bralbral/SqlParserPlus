@@ -27,7 +27,7 @@ Run:
 -------------
 
 ```
-   docker run --rm -v /abs_path_to_dir_at_your_host:/sqlfolder  test  python3 ./SqlParserPlus.py --sqlextract /sqlfolder --dumpall
+   docker run --rm -v /abs_path_to_dir_at_your_host:/sqlfolder  bral1488/sql_parser_plus:latest  python3 ./SqlParserPlus.py --sqlextract /sqlfolder --dumpall
 ```
 
 *WARNING:* the --dumpall key must be set, otherwise a [gui](window.JPG) that is not available in the container will be called.
